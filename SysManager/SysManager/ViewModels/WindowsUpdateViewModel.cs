@@ -22,6 +22,28 @@ public partial class WindowsUpdateViewModel : ViewModelBase
         _runner.LineReceived += l => Console.Append(l);
         _runner.ProgressChanged += p => Progress = p;
         IsElevated = AdminHelper.IsElevated();
+
+        // Auto-check the module the first time the tab is shown.
+        _ = AutoCheckOnStartAsync();
+    }
+
+    /// <summary>
+    /// Fires once on construction so the user sees the module status (and
+    /// the "Install PSWindowsUpdate" banner if it's missing) without having
+    /// to click anything.
+    /// </summary>
+    private async Task AutoCheckOnStartAsync()
+    {
+        try
+        {
+            // Give the UI a beat to bind before we start writing to it.
+            await Task.Delay(250);
+            await CheckModuleAsync();
+        }
+        catch
+        {
+            // Swallow — manual "Check module" still works.
+        }
     }
 
     [RelayCommand]

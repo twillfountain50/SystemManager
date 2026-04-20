@@ -120,6 +120,14 @@ public class PowerShellRunner
         string arguments,
         CancellationToken cancellationToken = default)
     {
+        // Always launch from a neutral system directory so the spawned
+        // process never inherits a "locked" CWD (e.g. a user's Downloads
+        // folder on another drive, which causes "Access is denied" when
+        // running chkdsk.exe even under elevation).
+        var workingDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
+        if (string.IsNullOrWhiteSpace(workingDir) || !System.IO.Directory.Exists(workingDir))
+            workingDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+
         var psi = new System.Diagnostics.ProcessStartInfo
         {
             FileName = fileName,
@@ -128,6 +136,7 @@ public class PowerShellRunner
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true,
+            WorkingDirectory = workingDir,
             StandardOutputEncoding = System.Text.Encoding.UTF8,
             StandardErrorEncoding = System.Text.Encoding.UTF8,
         };

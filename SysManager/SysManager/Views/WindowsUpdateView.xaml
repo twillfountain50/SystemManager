@@ -54,10 +54,40 @@
         </Border>
 
         <!-- Module status -->
-        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="28,16,28,0">
-            <StackPanel>
-                <TextBlock Text="PSWindowsUpdate module" Style="{StaticResource SectionTitle}"/>
-                <TextBlock Text="{Binding ModuleStatus}" Style="{StaticResource Subtle}" Margin="0,4,0,0"/>
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="28,16,28,0"
+                BorderBrush="#F59E0B" BorderThickness="1"
+                Visibility="{Binding ModuleAvailable, Converter={StaticResource FlexVis}, ConverterParameter=Inverse}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="&#xE946;" FontFamily="Segoe Fluent Icons,Segoe MDL2 Assets"
+                                   FontSize="18" Foreground="#F59E0B" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock Text="PSWindowsUpdate module is required" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="#F59E0B" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding ModuleStatus}" Style="{StaticResource Subtle}" Margin="28,6,0,0" TextWrapping="Wrap"/>
+                    <TextBlock Text="Click Install to add it from the PowerShell Gallery. Needs administrator rights."
+                               Style="{StaticResource Subtle}" Margin="28,2,0,0" TextWrapping="Wrap"/>
+                </StackPanel>
+                <Button Grid.Column="1" Content="Install PSWindowsUpdate"
+                        Command="{Binding InstallModuleCommand}"
+                        Style="{StaticResource PrimaryButton}"
+                        Padding="18,10" FontSize="14" VerticalAlignment="Center" Margin="16,0,0,0"/>
+            </Grid>
+        </Border>
+
+        <!-- Module available — quiet green pill -->
+        <Border Grid.Row="2" Style="{StaticResource Card}" Margin="28,16,28,0"
+                Visibility="{Binding ModuleAvailable, Converter={StaticResource FlexVis}}">
+            <StackPanel Orientation="Horizontal">
+                <Ellipse Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,10,0" Fill="#22C55E"/>
+                <TextBlock Text="PSWindowsUpdate is available" FontWeight="SemiBold" Foreground="#22C55E" VerticalAlignment="Center"/>
+                <TextBlock Text="  ·  " Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ModuleStatus}" Style="{StaticResource Subtle}" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 

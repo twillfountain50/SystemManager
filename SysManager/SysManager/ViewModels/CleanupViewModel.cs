@@ -8,11 +8,28 @@ namespace SysManager.ViewModels;
 public partial class CleanupViewModel : ViewModelBase
 {
     private readonly PowerShellRunner _runner;
-    private CancellationTokenSource? _cts;
+
+    private CancellationTokenSource? _tempCts;
+    private CancellationTokenSource? _binCts;
+    private CancellationTokenSource? _sfcCts;
+    private CancellationTokenSource? _dismCts;
 
     public ConsoleViewModel Console { get; } = new();
 
     [ObservableProperty] private bool _isElevated;
+
+    // Per-task running flags so buttons stay independent and the main thread
+    // doesn't block a user navigating away while SFC grinds for 10 minutes.
+    [ObservableProperty] private bool _isTempRunning;
+    [ObservableProperty] private bool _isBinRunning;
+    [ObservableProperty] private bool _isSfcRunning;
+    [ObservableProperty] private bool _isDismRunning;
+
+    [ObservableProperty] private string _sfcStatus = "Idle";
+    [ObservableProperty] private string _dismStatus = "Idle";
+
+    /// <summary>True whenever any background task is running — for a small badge.</summary>
+    public bool IsAnyRunning => IsTempRunning || IsBinRunning || IsSfcRunning || IsDismRunning;
 
     public CleanupViewModel(PowerShellRunner runner)
     {
@@ -22,19 +39,25 @@ public partial class CleanupViewModel : ViewModelBase
         IsElevated = AdminHelper.IsElevated();
     }
 
+    partial void OnIsTempRunningChanged(bool value) => OnPropertyChanged(nameof(IsAnyRunning));
+    partial void OnIsBinRunningChanged(bool value) => OnPropertyChanged(nameof(IsAnyRunning));
+    partial void OnIsSfcRunningChanged(bool value) => OnPropertyChanged(nameof(IsAnyRunning));
+    partial void OnIsDismRunningChanged(bool value) => OnPropertyChanged(nameof(IsAnyRunning));
+
     [RelayCommand]
     private void RelaunchAsAdmin()
     {
         if (AdminHelper.RelaunchAsAdmin())
-            System.Windows.Application.Current.Shutdown();
+            System.Windows.Application.Current?.Shutdown();
     }
 
     [RelayCommand]
     private async Task CleanTempAsync()
     {
-        IsBusy = true; IsProgressIndeterminate = true;
+        if (IsTempRunning) return;
+        IsTempRunning = true;
         StatusMessage = "Cleaning temp folders...";
-        _cts = new CancellationTokenSource();
+        _tempCts = new CancellationTokenSource();
         try
         {
             await _runner.RunScriptViaPwshAsync(@"
@@ -50,67 +73,90 @@ public partial class CleanupViewModel : ViewModelBase
                     }
                 }
                 ""Freed approximately $([Math]::Round($totalBytes/1MB,1)) MB""
-            ", cancellationToken: _cts.Token);
+            ", cancellationToken: _tempCts.Token);
             StatusMessage = "Temp cleanup done";
         }
         catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
-        finally { IsBusy = false; IsProgressIndeterminate = false; }
+        finally { IsTempRunning = false; }
     }
 
     [RelayCommand]
     private async Task EmptyRecycleBinAsync()
     {
-        IsBusy = true; IsProgressIndeterminate = true;
+        if (IsBinRunning) return;
+        IsBinRunning = true;
         StatusMessage = "Emptying Recycle Bin...";
-        _cts = new CancellationTokenSource();
+        _binCts = new CancellationTokenSource();
         try
         {
             await _runner.RunScriptViaPwshAsync(@"
                 Clear-RecycleBin -Force -ErrorAction SilentlyContinue
                 'Recycle Bin cleared'
-            ", cancellationToken: _cts.Token);
+            ", cancellationToken: _binCts.Token);
             StatusMessage = "Done";
         }
         catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
-        finally { IsBusy = false; IsProgressIndeterminate = false; }
+        finally { IsBinRunning = false; }
     }
 
     [RelayCommand]
     private async Task RunSfcAsync()
     {
+        if (IsSfcRunning) return;
         if (!AdminHelper.IsElevated())
-        { StatusMessage = "SFC requires admin"; if (AdminHelper.RelaunchAsAdmin()) System.Windows.Application.Current.Shutdown(); return; }
+        {
+            StatusMessage = "SFC requires admin";
+            if (AdminHelper.RelaunchAsAdmin()) System.Windows.Application.Current?.Shutdown();
+            return;
+        }
 
-        IsBusy = true; IsProgressIndeterminate = true;
-        StatusMessage = "Running sfc /scannow — this can take several minutes...";
-        _cts = new CancellationTokenSource();
+        IsSfcRunning = true;
+        SfcStatus = "Running — can take 5–15 minutes";
+        StatusMessage = "SFC running in background. You can keep using the app.";
+        _sfcCts = new CancellationTokenSource();
         try
         {
-            await _runner.RunProcessAsync("sfc.exe", "/scannow", _cts.Token);
-            StatusMessage = "SFC complete";
+            var exit = await _runner.RunProcessAsync("sfc.exe", "/scannow", _sfcCts.Token);
+            SfcStatus = exit == 0 ? "Completed — no integrity issues found (or all fixed)." : $"Finished with exit {exit}.";
+            StatusMessage = SfcStatus;
         }
-        catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
-        finally { IsBusy = false; IsProgressIndeterminate = false; }
+        catch (OperationCanceledException) { SfcStatus = "Cancelled."; StatusMessage = SfcStatus; }
+        catch (Exception ex) { SfcStatus = $"Error: {ex.Message}"; StatusMessage = SfcStatus; }
+        finally { IsSfcRunning = false; }
     }
 
     [RelayCommand]
     private async Task RunDismAsync()
     {
+        if (IsDismRunning) return;
         if (!AdminHelper.IsElevated())
-        { StatusMessage = "DISM requires admin"; if (AdminHelper.RelaunchAsAdmin()) System.Windows.Application.Current.Shutdown(); return; }
+        {
+            StatusMessage = "DISM requires admin";
+            if (AdminHelper.RelaunchAsAdmin()) System.Windows.Application.Current?.Shutdown();
+            return;
+        }
 
-        IsBusy = true; IsProgressIndeterminate = true;
-        StatusMessage = "Running DISM /Online /Cleanup-Image /RestoreHealth...";
-        _cts = new CancellationTokenSource();
+        IsDismRunning = true;
+        DismStatus = "Running — can take 10–30 minutes";
+        StatusMessage = "DISM running in background. You can keep using the app.";
+        _dismCts = new CancellationTokenSource();
         try
         {
-            await _runner.RunProcessAsync("DISM.exe", "/Online /Cleanup-Image /RestoreHealth", _cts.Token);
-            StatusMessage = "DISM complete";
+            var exit = await _runner.RunProcessAsync("DISM.exe", "/Online /Cleanup-Image /RestoreHealth", _dismCts.Token);
+            DismStatus = exit == 0 ? "Completed." : $"Finished with exit {exit}.";
+            StatusMessage = DismStatus;
         }
-        catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
-        finally { IsBusy = false; IsProgressIndeterminate = false; }
+        catch (OperationCanceledException) { DismStatus = "Cancelled."; StatusMessage = DismStatus; }
+        catch (Exception ex) { DismStatus = $"Error: {ex.Message}"; StatusMessage = DismStatus; }
+        finally { IsDismRunning = false; }
     }
 
     [RelayCommand]
-    private void Cancel() => _cts?.Cancel();
+    private void Cancel()
+    {
+        _tempCts?.Cancel();
+        _binCts?.Cancel();
+        _sfcCts?.Cancel();
+        _dismCts?.Cancel();
+    }
 }

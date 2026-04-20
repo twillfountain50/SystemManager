@@ -13,12 +13,14 @@ public partial class SystemHealthViewModel : ViewModelBase
     private readonly SystemInfoService _sys;
     private readonly DiskHealthService _diskHealth = new();
     private readonly MemoryTestService _memTest = new();
+    private readonly FixedDriveService _drives = new();
     private readonly PowerShellRunner _runner = new();
     private CancellationTokenSource? _cts;
 
     public ObservableCollection<MemoryModule> Modules { get; } = new();
     public ObservableCollection<DiskInfo> Disks { get; } = new();
     public ObservableCollection<DiskHealthReport> DiskHealth { get; } = new();
+    public ObservableCollection<DriveTarget> ChkdskDrives { get; } = new();
 
     public ConsoleViewModel Console { get; } = new();
 
@@ -27,6 +29,8 @@ public partial class SystemHealthViewModel : ViewModelBase
     [ObservableProperty] private MemoryInfo? _memory;
     [ObservableProperty] private string _summary = "Press 'Scan' to collect system info";
     [ObservableProperty] private bool _isElevated;
+    [ObservableProperty] private bool _isChkdskRunning;
+    [ObservableProperty] private string _chkdskStatus = string.Empty;
 
     // Memory diagnostic summary
     [ObservableProperty] private int _wheaMemoryErrors;
@@ -39,6 +43,10 @@ public partial class SystemHealthViewModel : ViewModelBase
         _sys = sys;
         IsElevated = AdminHelper.IsElevated();
         _runner.LineReceived += l => Console.Append(l);
+
+        // Kick off drive discovery in the background so the list is ready
+        // when the user opens the tab.
+        _ = RefreshDrivesAsync();
     }
 
     [RelayCommand]
@@ -59,9 +67,36 @@ public partial class SystemHealthViewModel : ViewModelBase
             foreach (var d in snap.Disks) Disks.Add(d);
             Summary = $"OS {snap.Os.Caption}  —  CPU {snap.Cpu.Name} ({snap.Cpu.Cores}c/{snap.Cpu.LogicalProcessors}t)  —  RAM {snap.Memory.UsedGB:0.0}/{snap.Memory.TotalGB:0.0} GB  —  Disks {snap.Disks.Count}";
             StatusMessage = $"Scan at {snap.CapturedAt:HH:mm:ss}";
+            await RefreshDrivesAsync();
         }
         catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
         finally { IsBusy = false; IsProgressIndeterminate = false; }
+    }
+
+    [RelayCommand]
+    private async Task RefreshDrivesAsync()
+    {
+        try
+        {
+            var list = await _drives.EnumerateAsync();
+            ChkdskDrives.Clear();
+            foreach (var d in list)
+            {
+                ChkdskDrives.Add(new DriveTarget
+                {
+                    Letter = d.Letter,
+                    Label = d.Label,
+                    FileSystem = d.FileSystem,
+                    SizeGB = d.SizeGB,
+                    FreeGB = d.FreeGB,
+                    MediaType = d.MediaType,
+                    BusType = d.BusType,
+                    IsSelected = string.Equals(d.Letter, "C:", StringComparison.OrdinalIgnoreCase),
+                    Status = "Idle"
+                });
+            }
+        }
+        catch (Exception ex) { StatusMessage = $"Drive enumeration failed: {ex.Message}"; }
     }
 
     [RelayCommand]
@@ -117,8 +152,6 @@ public partial class SystemHealthViewModel : ViewModelBase
     [RelayCommand]
     private void ScheduleMemoryTest()
     {
-        // mdsched.exe shows a dialog asking "Restart now" or "at next boot".
-        // We just open it; the user confirms.
         var ok = _memTest.ScheduleAtNextBoot();
         StatusMessage = ok
             ? "Windows Memory Diagnostic launched — choose a schedule option."
@@ -141,28 +174,101 @@ public partial class SystemHealthViewModel : ViewModelBase
     [RelayCommand]
     private async Task RunChkdskAsync(string? driveLetter)
     {
-        if (string.IsNullOrWhiteSpace(driveLetter)) driveLetter = "C:";
-        IsBusy = true;
-        IsProgressIndeterminate = true;
-        StatusMessage = $"Running chkdsk {driveLetter} (read-only)...";
+        if (string.IsNullOrWhiteSpace(driveLetter))
+        {
+            StatusMessage = "No drive specified.";
+            return;
+        }
+
+        var target = ChkdskDrives.FirstOrDefault(d => string.Equals(d.Letter, driveLetter, StringComparison.OrdinalIgnoreCase));
+        IsChkdskRunning = true;
         _cts = new CancellationTokenSource();
         try
         {
-            // Read-only scan — safe to run without admin, reports without repairing.
-            await _runner.RunProcessAsync("chkdsk.exe", $"{driveLetter} /scan", _cts.Token);
-            StatusMessage = "chkdsk done.";
+            await RunChkdskCoreAsync(driveLetter, target, _cts.Token);
         }
-        catch (Exception ex) { StatusMessage = $"Error: {ex.Message}"; }
-        finally { IsBusy = false; IsProgressIndeterminate = false; }
+        finally { IsChkdskRunning = false; }
+    }
+
+    [RelayCommand]
+    private async Task RunChkdskOnSelectedAsync()
+    {
+        var selected = ChkdskDrives.Where(d => d.IsSelected).ToList();
+        if (selected.Count == 0)
+        {
+            StatusMessage = "Select at least one drive.";
+            return;
+        }
+
+        IsChkdskRunning = true;
+        ChkdskStatus = $"Scanning {selected.Count} drive(s)...";
+        _cts = new CancellationTokenSource();
+        try
+        {
+            for (var i = 0; i < selected.Count; i++)
+            {
+                if (_cts.Token.IsCancellationRequested) break;
+                var d = selected[i];
+                ChkdskStatus = $"[{i + 1}/{selected.Count}] Scanning {d.Letter} — {d.Label}";
+                await RunChkdskCoreAsync(d.Letter, d, _cts.Token);
+            }
+            ChkdskStatus = _cts.Token.IsCancellationRequested ? "Cancelled." : "All scans finished.";
+        }
+        finally { IsChkdskRunning = false; }
+    }
+
+    private async Task RunChkdskCoreAsync(string driveLetter, DriveTarget? target, CancellationToken ct)
+    {
+        StatusMessage = $"Running chkdsk {driveLetter} (read-only)...";
+        if (target != null) target.Status = "Running...";
+        try
+        {
+            // /scan = online read-only scan; non-destructive, reports only.
+            var exit = await _runner.RunProcessAsync("chkdsk.exe", $"{driveLetter} /scan", ct);
+            if (target != null)
+                target.Status = exit == 0 ? "OK" : $"Exit {exit}";
+            StatusMessage = $"chkdsk {driveLetter} done (exit {exit}).";
+        }
+        catch (OperationCanceledException)
+        {
+            if (target != null) target.Status = "Cancelled";
+            StatusMessage = $"chkdsk {driveLetter} cancelled.";
+        }
+        catch (Exception ex)
+        {
+            if (target != null) target.Status = "Error";
+            StatusMessage = $"Error on {driveLetter}: {ex.Message}";
+        }
     }
 
     [RelayCommand]
     private void RelaunchAsAdmin()
     {
         if (AdminHelper.RelaunchAsAdmin())
-            System.Windows.Application.Current.Shutdown();
+            System.Windows.Application.Current?.Shutdown();
     }
 
     [RelayCommand]
     private void CancelScan() => _cts?.Cancel();
+}
+
+/// <summary>
+/// A fixed drive shown in the chkdsk selector. Mutable so the UI can reflect
+/// live status ("Running...", "OK", "Error") as scans progress.
+/// </summary>
+public partial class DriveTarget : ObservableObject
+{
+    [ObservableProperty] private bool _isSelected;
+    [ObservableProperty] private string _status = "Idle";
+    public string Letter { get; init; } = "C:";
+    public string Label { get; init; } = "";
+    public string FileSystem { get; init; } = "NTFS";
+    public double SizeGB { get; init; }
+    public double FreeGB { get; init; }
+    public string MediaType { get; init; } = "";
+    public string BusType { get; init; } = "";
+
+    public string Display => string.IsNullOrWhiteSpace(Label) || Label == Letter
+        ? $"{Letter}  ·  {SizeGB:F0} GB {FileSystem}"
+        : $"{Letter}  {Label}  ·  {SizeGB:F0} GB {FileSystem}";
 }

